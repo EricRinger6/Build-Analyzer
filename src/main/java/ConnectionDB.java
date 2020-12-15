@@ -1,6 +1,9 @@
 
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.*;
+import java.util.Scanner;
 
 
 public class ConnectionDB {
@@ -26,6 +29,12 @@ public class ConnectionDB {
 
 
                     String champ = Console.getString("Which champion will you be playing today?");
+                    if(champ.equals("Sylas") || champ.equals("Sett")){
+                        Console.println("\nDon't.\n");
+                        throw new SQLException();
+                    }
+
+                    Console.println(snarkyResponse(champ));
 
                     Statement state = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
                     ResultSet set = state.executeQuery("SELECT * FROM Champs WHERE name LIKE '%" + champ + "%'");
@@ -37,6 +46,8 @@ public class ConnectionDB {
             }
             catch (SQLException e){
                 Console.println("Champion does not exist, please try another.");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -80,5 +91,24 @@ public class ConnectionDB {
         for(Item i : champion.getBuild()){
             Console.println(i.getName());
         }
+    }
+
+    public Champion getChampion() {//for testing purposes
+        return champion;
+    }
+
+    public String snarkyResponse(String input) throws FileNotFoundException {
+        String output = "";
+        File file = new File("/Users/eric/Dev/Week7/Build-Analyzer/src/main/response.txt");
+        Scanner scanner = new Scanner(file);
+        Boolean loop = true;
+        while(loop){
+            output = scanner.nextLine();
+            if(output.startsWith(input)){
+                output = output.substring(input.length() + 2);
+                loop = false;
+            }
+        }
+        return output;
     }
 }
